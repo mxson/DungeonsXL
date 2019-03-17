@@ -16,7 +16,9 @@
  */
 package de.erethon.dungeonsxl.requirement;
 
+import de.erethon.commons.chat.MessageUtil;
 import de.erethon.dungeonsxl.DungeonsXL;
+import de.erethon.dungeonsxl.config.DMessage;
 import de.erethon.dungeonsxl.player.DGroup;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -84,6 +86,25 @@ public class GroupSizeRequirement extends Requirement {
 
     @Override
     public void demand(Player player) {
+    }
+
+    @Override
+    public void showFailureMessage(Player player) {
+        DGroup dGroup = DGroup.getByPlayer(player);
+        int size = dGroup.getPlayers().size();
+        String segment1 = null;
+        String segment2 = null;
+        //Your group                  players,
+        //           dont have enough          minimum is 5
+        //           have too many             maximum is 10
+        if (size < minimum) {
+            segment1 = "doesn't have enough";
+            segment2 = "minimum is " + minimum;
+        } else if(size > maximum) {
+            segment1 = "has too many";
+            segment2 = "maximum is " + maximum;
+        }
+        if(segment1 != null) MessageUtil.sendMessage(player, DMessage.GROUP_SIZE_REQUIREMENT.getMessage(segment1, segment2));
     }
 
 }

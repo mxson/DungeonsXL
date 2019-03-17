@@ -93,6 +93,11 @@ public class FeeLevelRequirement extends Requirement {
         MessageUtil.sendMessage(player, DMessage.REQUIREMENT_FEE.getMessage(fee + " levels"));
     }
 
+    @Override
+    public void showFailureMessage(Player player) {
+        MessageUtil.sendMessage(player, DMessage.FEE_REQUIREMENT.getMessage(fee + " levels"));
+    }
+
     private boolean isKeepInventory(Player player) {
         if (keepInventory != null) {
             return keepInventory;

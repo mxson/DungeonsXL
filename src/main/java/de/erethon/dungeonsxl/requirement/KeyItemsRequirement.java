@@ -18,9 +18,13 @@ package de.erethon.dungeonsxl.requirement;
 
 import de.erethon.caliburn.CaliburnAPI;
 import de.erethon.caliburn.item.ExItem;
+import de.erethon.commons.chat.MessageUtil;
 import de.erethon.dungeonsxl.DungeonsXL;
 import java.util.ArrayList;
 import java.util.List;
+
+import de.erethon.dungeonsxl.config.DMessage;
+import de.erethon.dungeonsxl.util.StringUtil;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -74,6 +78,24 @@ public class KeyItemsRequirement extends Requirement {
 
     @Override
     public void demand(Player player) {
+    }
+
+    @Override
+    public void showFailureMessage(Player player) {
+        List<ExItem> keyItems = new ArrayList<>(this.keyItems);
+        for (ItemStack item : player.getInventory().getContents()) {
+            if (item == null) {
+                continue;
+            }
+            keyItems.remove(caliburn.getExItem(item));
+        }
+        final List<String> missing = new ArrayList<>();
+        for (ExItem keyItem : keyItems) {
+            missing.add(keyItem.getName().toLowerCase());
+        }
+        if(missing.size() > 0) {
+            MessageUtil.sendMessage(player, DMessage.KEY_ITEM_REQUIREMENT.getMessage(StringUtil.concatList(missing)));
+        }
     }
 
 }
