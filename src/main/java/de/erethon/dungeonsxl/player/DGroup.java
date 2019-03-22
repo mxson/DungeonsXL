@@ -906,7 +906,7 @@ public class DGroup {
         }
 
         for (DGamePlayer dPlayer : getDGamePlayers()) {
-            if (!dPlayer.checkTimeAfterStart(game) || !dPlayer.checkTimeAfterFinish(game)) {
+            if (!dPlayer.checkTimeAfterStart(game.getDungeon(), game.getRules()) || !dPlayer.checkTimeAfterFinish(game.getDungeon(), game.getRules())) {
                 return false;
             }
         }
@@ -920,7 +920,7 @@ public class DGroup {
         }
 
         for (DGamePlayer dPlayer : getDGamePlayers()) {
-            if (!dPlayer.checkRequirements(game)) {
+            if (!dPlayer.checkRequirements(game.getDungeon(), game.getRules())) {
                 return false;
             }
         }

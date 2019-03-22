@@ -685,7 +685,7 @@ public class DGamePlayer extends DInstancePlayer {
     }
 
     public boolean checkTimeAfterFinish(Dungeon dungeon, GameRuleProvider rules) {
-        return checkTime(game.getDungeon(), game.getRules().getTimeToNextPlayAfterFinish(), getData().getTimeLastFinished(game.getDungeon().getName()));
+        return checkTime(rules.getTimeToNextPlayAfterFinish(), getData().getTimeLastFinished(dungeon.getName()));
     }
 
     public boolean checkTime(int requirement, long dataTime) {
