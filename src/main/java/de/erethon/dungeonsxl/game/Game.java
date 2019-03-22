@@ -217,39 +217,7 @@ public class Game {
      * config: Default values 6. The default values
      */
     public void fetchRules() {
-        DungeonConfig dungeonConfig = null;
-        if (getDungeon() != null) {
-            dungeonConfig = getDungeon().getConfig();
-        }
-
-        WorldConfig floorConfig = null;
-        if (world != null) {
-            floorConfig = world.getConfig();
-        }
-
-        GameRuleProvider finalRules = new GameRuleProvider();
-
-        if (type != null) {
-            finalRules.apply(type);
-        }
-
-        if (dungeonConfig != null && dungeonConfig.getOverrideValues() != null) {
-            finalRules.apply(dungeonConfig.getOverrideValues());
-        }
-
-        if (floorConfig != null) {
-            finalRules.apply(floorConfig);
-        }
-
-        if (dungeonConfig != null && dungeonConfig.getDefaultValues() != null) {
-            finalRules.apply(dungeonConfig.getDefaultValues());
-        }
-
-        finalRules.apply(plugin.getMainConfig().getDefaultWorldConfig());
-
-        finalRules.apply(GameRuleProvider.DEFAULT_VALUES);
-
-        rules = finalRules;
+        rules = getGameRules(this.type, this.world, this.getDungeon());
     }
 
     /**
@@ -468,6 +436,43 @@ public class Game {
         } else {
             return null;
         }
+    }
+
+    // make this accessible outside
+    public static GameRuleProvider getGameRules(GameType type, DGameWorld world, Dungeon dungeon) {
+        DungeonConfig dungeonConfig = null;
+        if (dungeon != null) {
+            dungeonConfig = dungeon.getConfig();
+        }
+
+        WorldConfig floorConfig = null;
+        if (world != null) {
+            floorConfig = world.getConfig();
+        }
+
+        GameRuleProvider finalRules = new GameRuleProvider();
+
+        if (type != null) {
+            finalRules.apply(type);
+        }
+
+        if (dungeonConfig != null && dungeonConfig.getOverrideValues() != null) {
+            finalRules.apply(dungeonConfig.getOverrideValues());
+        }
+
+        if (floorConfig != null) {
+            finalRules.apply(floorConfig);
+        }
+
+        if (dungeonConfig != null && dungeonConfig.getDefaultValues() != null) {
+            finalRules.apply(dungeonConfig.getDefaultValues());
+        }
+
+        finalRules.apply(DungeonsXL.getInstance().getMainConfig().getDefaultWorldConfig());
+
+        finalRules.apply(GameRuleProvider.DEFAULT_VALUES);
+
+        return finalRules;
     }
 
     @Override

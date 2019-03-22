@@ -568,28 +568,26 @@ public class DGamePlayer extends DInstancePlayer {
         }
     }
 
-    public boolean checkRequirements(Game game) {
+    public boolean checkRequirements(Dungeon dungeon, GameRuleProvider rules) {
         if (DPermission.hasPermission(player, DPermission.IGNORE_REQUIREMENTS)) {
             return true;
         }
 
-        GameRuleProvider rules = game.getRules();
-
-        if (!checkTimeAfterStart(game) && !checkTimeAfterFinish(game)) {
+        if (!checkTimeAfterStart(dungeon, rules) && !checkTimeAfterFinish(dungeon, rules)) {
             final boolean check = rules.getTimeToNextPlayAfterStart() >= rules.getTimeToNextPlayAfterFinish();
-            long endTime = check ? getTimeStartEnd(game) : getTimeFinishEnd(game); // greater than Systemn current ms
+            long endTime = check ? getTimeStartEnd(dungeon, rules) : getTimeFinishEnd(dungeon, rules); // greater than Systemn current ms
             final String timeLeft = StringUtil.humanReadableMillis(System.currentTimeMillis() - endTime);
 
             MessageUtil.sendMessage(player, DMessage.ERROR_COOLDOWN.getMessage(timeLeft));
             return false;
 
-        } else if (!checkTimeAfterStart(game)) {
-            final String message = StringUtil.humanReadableMillis(getTimeStartEnd(game) - System.currentTimeMillis());
+        } else if (!checkTimeAfterStart(dungeon, rules)) {
+            final String message = StringUtil.humanReadableMillis(getTimeStartEnd(dungeon, rules) - System.currentTimeMillis());
             MessageUtil.sendMessage(player, DMessage.ERROR_COOLDOWN.getMessage(message));
             return false;
 
-        } else if (!checkTimeAfterFinish(game)) {
-            final String message = StringUtil.humanReadableMillis(getTimeFinishEnd(game) - System.currentTimeMillis());
+        } else if (!checkTimeAfterFinish(dungeon, rules)) {
+            final String message = StringUtil.humanReadableMillis(getTimeFinishEnd(dungeon, rules) - System.currentTimeMillis());
             MessageUtil.sendMessage(player, DMessage.ERROR_COOLDOWN.getMessage(message));
             return false;
         }
@@ -666,8 +664,16 @@ public class DGamePlayer extends DInstancePlayer {
         return true;
     }
 
-    public boolean checkTimeAfterStart(Game game) {
-        return checkTime(game.getDungeon(), game.getRules().getTimeToNextPlayAfterStart(), getData().getTimeLastStarted(game.getDungeon().getName()));
+    public boolean checkTimeAfterStart(Dungeon dungeon, GameRuleProvider rules) {
+        return checkTime(rules.getTimeToNextPlayAfterStart(), getData().getTimeLastStarted(dungeon.getName()));
+    }
+
+    public long getTimeStartEnd(Dungeon dungeon, GameRuleProvider rules) {
+        return getData().getTimeLastStarted(dungeon.getName()) + rules.getTimeToNextPlayAfterStart() * 1000 * 60 * 60;
+    }
+
+    public long getTimeFinishEnd(Dungeon dungeon, GameRuleProvider rules) {
+        return getData().getTimeLastFinished(dungeon.getName()) + rules.getTimeToNextPlayAfterFinish() * 1000 * 60 * 60;
     }
 
     public long getTimeStartEnd(Game game) {
@@ -678,11 +684,11 @@ public class DGamePlayer extends DInstancePlayer {
         return getData().getTimeLastFinished(game.getDungeon().getName()) + game.getRules().getTimeToNextPlayAfterFinish() * 1000 * 60 * 60;
     }
 
-    public boolean checkTimeAfterFinish(Game game) {
+    public boolean checkTimeAfterFinish(Dungeon dungeon, GameRuleProvider rules) {
         return checkTime(game.getDungeon(), game.getRules().getTimeToNextPlayAfterFinish(), getData().getTimeLastFinished(game.getDungeon().getName()));
     }
 
-    public boolean checkTime(Dungeon dungeon, int requirement, long dataTime) {
+    public boolean checkTime(int requirement, long dataTime) {
         if (DPermission.hasPermission(player, DPermission.IGNORE_TIME_LIMIT)) {
             return true;
         }
@@ -716,18 +722,24 @@ public class DGamePlayer extends DInstancePlayer {
             return false;
         }
 
-        Game game = Game.getByGameWorld(dGroup.getGameWorld());
-        if (game == null) {
-            game = new Game(plugin, dGroup, gameType, dGroup.getGameWorld());
+        Dungeon dungeon;
+        GameRuleProvider rules;
+
+        Game foundGame = Game.getByGameWorld(dGroup.getGameWorld());
+        if (foundGame == null) {
+            dungeon = dGroup.getDungeon();
+            rules = Game.getGameRules(gameType, dGroup.getGameWorld(), dungeon);
 
         } else {
-            game.setType(gameType);
+            dungeon = foundGame.getDungeon();
+            rules = foundGame.getRules();
         }
-        game.fetchRules();
 
-        if (!checkRequirements(game)) { // check requirements should send message
+        if (!checkRequirements(dungeon, rules)) { // check requirements should send message
             return false;
         }
+        Game game = foundGame == null ? new Game(plugin, dGroup, gameType, dGroup.getGameWorld()) : foundGame;
+        game.fetchRules();
 
         ready = true;
 
