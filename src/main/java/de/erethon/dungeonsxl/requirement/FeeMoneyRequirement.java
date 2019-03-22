@@ -84,4 +84,9 @@ public class FeeMoneyRequirement extends Requirement {
         MessageUtil.sendMessage(player, DMessage.REQUIREMENT_FEE.getMessage(econ.format(fee)));
     }
 
+    @Override
+    public void showFailureMessage(Player player) {
+        MessageUtil.sendMessage(player, DMessage.FEE_REQUIREMENT.getMessage("$" + fee));
+    }
+
 }

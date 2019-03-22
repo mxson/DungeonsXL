@@ -16,10 +16,14 @@
  */
 package de.erethon.dungeonsxl.requirement;
 
+import de.erethon.commons.chat.MessageUtil;
 import de.erethon.dungeonsxl.DungeonsXL;
+import de.erethon.dungeonsxl.config.DMessage;
 import de.erethon.dungeonsxl.player.DPermission;
 import java.util.ArrayList;
 import java.util.List;
+
+import de.erethon.dungeonsxl.util.StringUtil;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
@@ -75,6 +79,19 @@ public class PermissionRequirement extends Requirement {
 
     @Override
     public void demand(Player player) {
+    }
+
+    @Override
+    public void showFailureMessage(Player player) {
+        List<String> missing = new ArrayList<>();
+        for (String permission : permissions) {
+            if (!DPermission.hasPermission(player, permission)) {
+                missing.add(permission);
+            }
+        }
+        if(missing.size() > 0) {
+            MessageUtil.sendMessage(player, DMessage.PERMISSION_REQUIREMENT.getMessage(StringUtil.concatList(missing)));
+        }
     }
 
 }

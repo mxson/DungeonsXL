@@ -448,6 +448,16 @@ public class GameRuleProvider {
     }
 
     /**
+     * @return only one map needs to be finished to play this map
+     */
+    public List<String> getFinishedOne() {
+        if(finishedOne == null) {
+            finishedOne = new ArrayList<>();
+        }
+        return finishedOne;
+    }
+
+    /**
      * @return the rewards
      */
     public List<Reward> getRewards() {

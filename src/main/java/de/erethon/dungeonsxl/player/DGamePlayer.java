@@ -37,6 +37,7 @@ import de.erethon.dungeonsxl.mob.DMob;
 import de.erethon.dungeonsxl.requirement.Requirement;
 import de.erethon.dungeonsxl.reward.Reward;
 import de.erethon.dungeonsxl.trigger.DistanceTrigger;
+import de.erethon.dungeonsxl.util.StringUtil;
 import de.erethon.dungeonsxl.world.DGameWorld;
 import de.erethon.dungeonsxl.world.DResourceWorld;
 import de.erethon.dungeonsxl.world.block.TeamFlag;
@@ -597,6 +598,7 @@ public class DGamePlayer extends DInstancePlayer {
             }
 
             if (!requirement.check(player)) {
+                requirement.showFailureMessage(player);
                 return false;
             }
         }
@@ -636,15 +638,20 @@ public class DGamePlayer extends DInstancePlayer {
                 }
 
                 if (bestTime == 0) {
+                    if(!doneTheOne) MessageUtil.sendMessage(player, DMessage.REQUIRE_FINISHED_ONCE.getMessage(StringUtil.concatList(rules.getFinishedOne())));
+                    else MessageUtil.sendMessage(player, DMessage.REQUIRE_FINISHED_ALL.getMessage(StringUtil.concatList(rules.getFinishedAll())));
                     return false;
 
                 } else if (rules.getTimeLastPlayed() != 0) {
                     if (System.currentTimeMillis() - bestTime > rules.getTimeLastPlayed() * (long) 3600000) {
+                        final long timeToWaitSeconds = ((rules.getTimeLastPlayed() * (long) 3600000) - (System.currentTimeMillis() - bestTime)) / 1000;
+                        MessageUtil.sendMessage(player, DMessage.REQUIRE_WAIT_BETWEEN.getMessage(timeToWaitSeconds + " seconds"));
                         return false;
                     }
                 }
 
                 if (numOfNeeded < rules.getFinishedAll().size() || !doneTheOne) {
+                    MessageUtil.sendMessage(player, DMessage.REQUIRE_FINISHED_ALL.getMessage(StringUtil.concatList(rules.getFinishedAll())));
                     return false;
                 }
 
@@ -706,7 +713,6 @@ public class DGamePlayer extends DInstancePlayer {
         game.fetchRules();
 
         if (!checkRequirements(game)) {
-            MessageUtil.sendMessage(player, DMessage.ERROR_REQUIREMENTS.getMessage());
             return false;
         }
 

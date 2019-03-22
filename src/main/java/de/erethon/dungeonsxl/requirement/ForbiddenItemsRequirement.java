@@ -18,8 +18,14 @@ package de.erethon.dungeonsxl.requirement;
 
 import de.erethon.caliburn.CaliburnAPI;
 import de.erethon.caliburn.item.ExItem;
+import de.erethon.commons.chat.MessageUtil;
 import de.erethon.dungeonsxl.DungeonsXL;
+
+import java.util.ArrayList;
 import java.util.List;
+
+import de.erethon.dungeonsxl.config.DMessage;
+import de.erethon.dungeonsxl.util.StringUtil;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -75,6 +81,23 @@ public class ForbiddenItemsRequirement extends Requirement {
 
     @Override
     public void demand(Player player) {
+    }
+
+    @Override
+    public void showFailureMessage(Player player) {
+        final List<String> forbiddenMessages = new ArrayList<>();
+        for (ItemStack item : player.getInventory().getContents()) {
+            if (item == null) {
+                continue;
+            }
+            ExItem exItem = caliburn.getExItem(item);
+            if (forbiddenItems.contains(exItem)) {
+                forbiddenMessages.add(exItem.getName().toLowerCase());
+            }
+        }
+        if(forbiddenMessages.size() > 0) {
+            MessageUtil.sendMessage(player, DMessage.FORBIDDEN_ITEM_REQUIREMENT.getMessage(StringUtil.concatList(forbiddenMessages)));
+        }
     }
 
 }

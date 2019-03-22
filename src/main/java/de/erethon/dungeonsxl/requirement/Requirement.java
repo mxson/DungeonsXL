@@ -69,6 +69,8 @@ public abstract class Requirement {
 
     public abstract void demand(Player player);
 
+    public abstract void showFailureMessage(Player player);
+
     public abstract RequirementType getType();
 
     @Override
