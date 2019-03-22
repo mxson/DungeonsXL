@@ -576,16 +576,21 @@ public class DGamePlayer extends DInstancePlayer {
         GameRuleProvider rules = game.getRules();
 
         if (!checkTimeAfterStart(game) && !checkTimeAfterFinish(game)) {
-            int longestTime = rules.getTimeToNextPlayAfterStart() >= rules.getTimeToNextPlayAfterFinish() ? rules.getTimeToNextPlayAfterStart() : rules.getTimeToNextPlayAfterFinish();
-            MessageUtil.sendMessage(player, DMessage.ERROR_COOLDOWN.getMessage(String.valueOf(longestTime)));
+            final boolean check = rules.getTimeToNextPlayAfterStart() >= rules.getTimeToNextPlayAfterFinish();
+            long endTime = check ? getTimeStartEnd(game) : getTimeFinishEnd(game); // greater than Systemn current ms
+            final String timeLeft = StringUtil.humanReadableMillis(System.currentTimeMillis() - endTime);
+
+            MessageUtil.sendMessage(player, DMessage.ERROR_COOLDOWN.getMessage(timeLeft));
             return false;
 
         } else if (!checkTimeAfterStart(game)) {
-            MessageUtil.sendMessage(player, DMessage.ERROR_COOLDOWN.getMessage(String.valueOf(rules.getTimeToNextPlayAfterStart())));
+            final String message = StringUtil.humanReadableMillis(getTimeStartEnd(game) - System.currentTimeMillis());
+            MessageUtil.sendMessage(player, DMessage.ERROR_COOLDOWN.getMessage(message));
             return false;
 
         } else if (!checkTimeAfterFinish(game)) {
-            MessageUtil.sendMessage(player, DMessage.ERROR_COOLDOWN.getMessage(String.valueOf(rules.getTimeToNextPlayAfterFinish())));
+            final String message = StringUtil.humanReadableMillis(getTimeFinishEnd(game) - System.currentTimeMillis());
+            MessageUtil.sendMessage(player, DMessage.ERROR_COOLDOWN.getMessage(message));
             return false;
         }
 
@@ -665,6 +670,14 @@ public class DGamePlayer extends DInstancePlayer {
         return checkTime(game.getDungeon(), game.getRules().getTimeToNextPlayAfterStart(), getData().getTimeLastStarted(game.getDungeon().getName()));
     }
 
+    public long getTimeStartEnd(Game game) {
+        return getData().getTimeLastStarted(game.getDungeon().getName()) + game.getRules().getTimeToNextPlayAfterStart() * 1000 * 60 * 60;
+    }
+
+    public long getTimeFinishEnd(Game game) {
+        return getData().getTimeLastFinished(game.getDungeon().getName()) + game.getRules().getTimeToNextPlayAfterFinish() * 1000 * 60 * 60;
+    }
+
     public boolean checkTimeAfterFinish(Game game) {
         return checkTime(game.getDungeon(), game.getRules().getTimeToNextPlayAfterFinish(), getData().getTimeLastFinished(game.getDungeon().getName()));
     }
@@ -712,7 +725,7 @@ public class DGamePlayer extends DInstancePlayer {
         }
         game.fetchRules();
 
-        if (!checkRequirements(game)) {
+        if (!checkRequirements(game)) { // check requirements should send message
             return false;
         }
 
