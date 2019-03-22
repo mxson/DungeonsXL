@@ -573,6 +573,7 @@ public class DGamePlayer extends DInstancePlayer {
             return true;
         }
 
+
         if (!checkTimeAfterStart(dungeon, rules) && !checkTimeAfterFinish(dungeon, rules)) {
             final boolean check = rules.getTimeToNextPlayAfterStart() >= rules.getTimeToNextPlayAfterFinish();
             long endTime = check ? getTimeStartEnd(dungeon, rules) : getTimeFinishEnd(dungeon, rules); // greater than Systemn current ms
@@ -676,16 +677,8 @@ public class DGamePlayer extends DInstancePlayer {
         return getData().getTimeLastFinished(dungeon.getName()) + rules.getTimeToNextPlayAfterFinish() * 1000 * 60 * 60;
     }
 
-    public long getTimeStartEnd(Game game) {
-        return getData().getTimeLastStarted(game.getDungeon().getName()) + game.getRules().getTimeToNextPlayAfterStart() * 1000 * 60 * 60;
-    }
-
-    public long getTimeFinishEnd(Game game) {
-        return getData().getTimeLastFinished(game.getDungeon().getName()) + game.getRules().getTimeToNextPlayAfterFinish() * 1000 * 60 * 60;
-    }
-
     public boolean checkTimeAfterFinish(Dungeon dungeon, GameRuleProvider rules) {
-        return checkTime(game.getDungeon(), game.getRules().getTimeToNextPlayAfterFinish(), getData().getTimeLastFinished(game.getDungeon().getName()));
+        return checkTime(rules.getTimeToNextPlayAfterFinish(), getData().getTimeLastFinished(dungeon.getName()));
     }
 
     public boolean checkTime(int requirement, long dataTime) {

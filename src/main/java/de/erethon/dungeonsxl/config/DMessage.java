@@ -63,7 +63,7 @@ public enum DMessage implements Message {
     ERROR_CMD("Error_Cmd", "&4Commands are not allowed while in a dungeon!"),
     ERROR_CMD_NOT_EXIST_1("Error_CmdNotExist1", "&4Command &6&v1&4 does not exist!"),
     ERROR_CMD_NOT_EXIST_2("Error_CmdNotExist2", "&4Please enter &6/dxl help&4 for help!"),
-    ERROR_COOLDOWN("Error_Cooldown", "&4You can enter this dungeon after &4v1"),
+    ERROR_COOLDOWN("Error_Cooldown", "&4You can only enter this dungeon every &6&v1&4 hours!"),
     ERROR_DISPENSER("Error_Dispenser", "&4You cannot access this dispenser!"),
     ERROR_DROP("Error_Drop", "&4You cannot drop safe items"),
     ERROR_DUNGEON_NOT_EXIST("Error_DungeonNotExist", "&4This dungeon does not exist."),
