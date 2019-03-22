@@ -186,6 +186,11 @@ public class DWorldListener implements Listener {
     @EventHandler
     public void onWeatherChange(WeatherChangeEvent event) {
         DInstanceWorld dWorld = dWorlds.getInstanceByWorld(event.getWorld());
+
+        if (dWorld == null) {
+            return; // We don't care about non-dungeon worlds
+        }
+
         if (dWorld instanceof DEditWorld && event.toWeatherState()) {
             event.setCancelled(true);
         } else if (dWorld instanceof DGameWorld) {
