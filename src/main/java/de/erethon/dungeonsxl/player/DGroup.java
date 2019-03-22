@@ -693,8 +693,13 @@ public class DGroup {
             return;
         }
 
+        if (gameWorld.getCompletionLocation() != null) {
+            getDGamePlayers().forEach(p -> p.player.teleport(gameWorld.getCompletionLocation()));
+        } else {
+            getDGamePlayers().forEach(p -> p.leave(false));
+        }
+
         Game.getByDGroup(this).resetWaveKills();
-        getDGamePlayers().forEach(p -> p.leave(false));
     }
 
     /**

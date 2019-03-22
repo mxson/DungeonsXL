@@ -45,6 +45,7 @@ public abstract class DInstanceWorld {
     World world;
     private int id;
     private Location lobby;
+    private Location completion;
 
     DInstanceWorld(DungeonsXL plugin, DResourceWorld resourceWorld, File folder, World world, int id) {
         this.plugin = plugin;
@@ -121,6 +122,20 @@ public abstract class DInstanceWorld {
      */
     public void setLobbyLocation(Location lobby) {
         this.lobby = lobby;
+    }
+
+    /**
+     * @return the location where players are sent after completing a dungeon
+     */
+    public Location getCompletionLocation() {
+        return completion;
+    }
+
+    /**
+     * @param completion the completion location for the given dungeon
+     */
+    public void setCompletionLocation(Location completion) {
+        this.completion = completion;
     }
 
     /**

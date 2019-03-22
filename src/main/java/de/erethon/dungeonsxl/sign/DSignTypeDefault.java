@@ -47,6 +47,7 @@ public enum DSignTypeDefault implements DSignType {
     DROP("Drop", "drop", false, false, DropSign.class),
     DUNGEON_CHEST("DungeonChest", "dungeonchest", true, false, DungeonChestSign.class),
     END("End", "end", false, true, EndSign.class),
+    COMPLETION("Completion", "completion", true, false, CompletionSign.class),
     @Deprecated
     EXTERNAL_MOB("ExternalMob", "mob", false, false, MobSign.class),
     FLAG("Flag", "flag", false, false, FlagSign.class),
@@ -73,7 +74,8 @@ public enum DSignTypeDefault implements DSignType {
     TELEPORT("Teleport", "teleport", false, false, TeleportSign.class),
     TITLE("Title", "title", true, false, TitleSign.class),
     TRIGGER("Trigger", "trigger", true, false, TriggerSign.class),
-    WAVE("Wave", "wave", false, false, WaveSign.class);
+    WAVE("Wave", "wave", false, false, WaveSign.class),
+    INFO("Info", "info", true, true, InfoSign.class);
 
     private String name;
     private String buildPermission;
