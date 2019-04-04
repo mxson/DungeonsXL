@@ -36,17 +36,12 @@ import de.erethon.dungeonsxl.reward.Reward;
 import de.erethon.dungeonsxl.util.DColor;
 import de.erethon.dungeonsxl.world.DGameWorld;
 import de.erethon.dungeonsxl.world.DResourceWorld;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
+
+import java.util.*;
 
 /**
  * Represents a group of players.
@@ -678,7 +673,9 @@ public class DGroup {
                 players.remove(offline);
             }
             Player player = offline.getPlayer();
-            new DGamePlayer(plugin, player, target);
+            if(game.checkTimeRequirements(player)) {
+                new DGamePlayer(plugin, player, target);
+            }
         }
         return true;
     }
@@ -781,6 +778,10 @@ public class DGroup {
         if (game == null) {
             return false;
         }
+        if (!checkRequirements(game)) {
+            return false;
+        }
+
         game.fetchRules();
         GameRuleProvider rules = game.getRules();
         gameWorld.setWeather(rules);

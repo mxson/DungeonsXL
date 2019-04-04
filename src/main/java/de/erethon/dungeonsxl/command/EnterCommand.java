@@ -86,8 +86,10 @@ public class EnterCommand extends DCommand {
         game.addDGroup(joining);
         joining.sendMessage(DMessage.CMD_ENTER_SUCCESS.getMessage(joining.getName(), target.getName()));
 
-        for (Player player : joining.getPlayers().getOnlinePlayers()) {
-            new DGamePlayer(plugin, player, game.getWorld(), game.getType());
+        if(joining.getPlayers().getOnlinePlayers().stream().allMatch(game::checkTimeRequirements)) {
+            for (Player groupPlayer : joining.getPlayers().getOnlinePlayers()) {
+                new DGamePlayer(plugin, groupPlayer, joining.getGameWorld());
+            }
         }
     }
 

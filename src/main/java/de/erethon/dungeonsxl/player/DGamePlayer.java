@@ -713,8 +713,8 @@ public class DGamePlayer extends DInstancePlayer {
         return rules.getTimeToNextLoot() * 60 * 60 * 1000 + getData().getTimeLastLoot(getDGroup().getDungeonName());
     }
 
-    public void ready() {
-        ready(GameTypeDefault.DEFAULT);
+    public boolean ready() {
+        return ready(GameTypeDefault.DEFAULT);
     }
 
     public boolean ready(GameType gameType) {

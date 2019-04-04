@@ -16,16 +16,20 @@
  */
 package de.erethon.dungeonsxl.game;
 
+import de.erethon.commons.chat.MessageUtil;
 import de.erethon.commons.player.PlayerUtil;
 import de.erethon.dungeonsxl.DungeonsXL;
 import de.erethon.dungeonsxl.config.DMessage;
 import de.erethon.dungeonsxl.dungeon.Dungeon;
 import de.erethon.dungeonsxl.dungeon.DungeonConfig;
 import de.erethon.dungeonsxl.global.GameSign;
+import de.erethon.dungeonsxl.player.DGlobalPlayer;
 import de.erethon.dungeonsxl.player.DGroup;
+import de.erethon.dungeonsxl.player.DPermission;
 import de.erethon.dungeonsxl.sign.DSign;
 import de.erethon.dungeonsxl.sign.MobSign;
 import de.erethon.dungeonsxl.trigger.ProgressTrigger;
+import de.erethon.dungeonsxl.util.StringUtil;
 import de.erethon.dungeonsxl.world.DGameWorld;
 import de.erethon.dungeonsxl.world.DResourceWorld;
 import de.erethon.dungeonsxl.world.WorldConfig;
@@ -111,6 +115,54 @@ public class Game {
             dGroup.setLives(rules.getInitialGroupLives());
             dGroup.setScore(rules.getInitialScore());
         }
+    }
+
+    public boolean checkTimeRequirements(Player player) {
+        if (DPermission.hasPermission(player.getPlayer(), DPermission.IGNORE_REQUIREMENTS)) {
+            return true;
+        }
+
+        DGlobalPlayer globalPlayer = plugin.getDPlayerCache().getByPlayer(player);
+        if (!checkTimeAfterStart(globalPlayer, getDungeon(), rules) && !checkTimeAfterFinish(globalPlayer, getDungeon(), rules)) {
+            final boolean check = rules.getTimeToNextPlayAfterStart() >= rules.getTimeToNextPlayAfterFinish();
+            long endTime = check ? getTimeStartEnd(globalPlayer, getDungeon(), rules) : getTimeFinishEnd(globalPlayer, getDungeon(), rules); // greater than Systemn current ms
+            final String timeLeft = StringUtil.humanReadableMillis(System.currentTimeMillis() - endTime);
+
+            MessageUtil.sendMessage(player, DMessage.ERROR_COOLDOWN.getMessage(timeLeft));
+            return false;
+
+        } else if (!checkTimeAfterStart(globalPlayer, getDungeon(), rules)) {
+            final String message = StringUtil.humanReadableMillis(getTimeStartEnd(globalPlayer, getDungeon(), rules) - System.currentTimeMillis());
+            MessageUtil.sendMessage(player, DMessage.ERROR_COOLDOWN.getMessage(message));
+            return false;
+
+        } else if (!checkTimeAfterFinish(globalPlayer, getDungeon(), rules)) {
+            final String message = StringUtil.humanReadableMillis(getTimeFinishEnd(globalPlayer, getDungeon(), rules) - System.currentTimeMillis());
+            MessageUtil.sendMessage(player, DMessage.ERROR_COOLDOWN.getMessage(message));
+            return false;
+        }
+
+        return true;
+    }
+
+    public boolean checkTimeAfterStart(DGlobalPlayer player, Dungeon dungeon, GameRuleProvider rules) {
+        return checkTime(rules.getTimeToNextPlayAfterStart(), player.getData().getTimeLastStarted(dungeon.getName()));
+    }
+
+    public long getTimeStartEnd(DGlobalPlayer player, Dungeon dungeon, GameRuleProvider rules) {
+        return player.getData().getTimeLastStarted(dungeon.getName()) + rules.getTimeToNextPlayAfterStart() * 1000 * 60 * 60;
+    }
+
+    public long getTimeFinishEnd(DGlobalPlayer player, Dungeon dungeon, GameRuleProvider rules) {
+        return player.getData().getTimeLastFinished(dungeon.getName()) + rules.getTimeToNextPlayAfterFinish() * 1000 * 60 * 60;
+    }
+
+    public boolean checkTimeAfterFinish(DGlobalPlayer player, Dungeon dungeon, GameRuleProvider rules) {
+        return checkTime(rules.getTimeToNextPlayAfterFinish(), player.getData().getTimeLastFinished(dungeon.getName()));
+    }
+
+    public boolean checkTime(int requirement, long dataTime) {
+        return dataTime == -1 || dataTime + requirement * 1000 * 60 * 60 <= System.currentTimeMillis();
     }
 
     /**

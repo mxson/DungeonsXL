@@ -250,13 +250,14 @@ public class DPortal extends GlobalProtection {
 
         if (game == null) {
             game = new Game(plugin, dGroup, target);
-
         } else {
             game.setWorld(target);
             dGroup.setGameWorld(target);
         }
 
-        new DGamePlayer(plugin, player, target);
+        if(game.checkTimeRequirements(player)) {
+            new DGamePlayer(plugin, player, target);
+        }
     }
 
     @Override
