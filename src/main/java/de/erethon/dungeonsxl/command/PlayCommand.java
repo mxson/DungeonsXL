@@ -44,7 +44,7 @@ public class PlayCommand extends DCommand {
         setMinArgs(1);
         setMaxArgs(1);
         setHelp(DMessage.HELP_CMD_PLAY.getMessage());
-        setPermission(DPermission.PLAY.getNode());
+        //setPermission(DPermission.PLAY.getNode());
         setPlayerCommand(true);
         setConsoleCommand(false);
     }
@@ -93,9 +93,11 @@ public class PlayCommand extends DCommand {
             MessageUtil.sendMessage(player, DMessage.ERROR_TOO_MANY_INSTANCES.getMessage());
             return;
         }
-        new Game(plugin, dGroup, gameWorld);
-        for (Player groupPlayer : dGroup.getPlayers().getOnlinePlayers()) {
-            new DGamePlayer(plugin, groupPlayer, dGroup.getGameWorld());
+        Game game = new Game(plugin, dGroup, gameWorld);
+        if(dGroup.getPlayers().getOnlinePlayers().stream().allMatch(game::checkTimeRequirements)) {
+            for (Player groupPlayer : dGroup.getPlayers().getOnlinePlayers()) {
+                new DGamePlayer(plugin, groupPlayer, dGroup.getGameWorld());
+            }
         }
     }
 

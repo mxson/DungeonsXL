@@ -1,5 +1,6 @@
 package de.erethon.dungeonsxl.util;
 
+import java.time.Duration;
 import java.util.List;
 
 public class StringUtil {
@@ -12,5 +13,12 @@ public class StringUtil {
             if(!last) builder.append(", ");
         }
         return builder.toString();
+    }
+
+    public static String humanReadableMillis(long time) {
+        return Duration.ofMillis(time).toString()
+                .substring(2)
+                .replaceAll("(\\d[HMS])(?!$)", "$1 ")
+                .toLowerCase();
     }
 }

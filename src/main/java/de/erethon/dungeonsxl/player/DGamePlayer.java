@@ -573,7 +573,6 @@ public class DGamePlayer extends DInstancePlayer {
             return true;
         }
 
-
         if (!checkTimeAfterStart(dungeon, rules) && !checkTimeAfterFinish(dungeon, rules)) {
             final boolean check = rules.getTimeToNextPlayAfterStart() >= rules.getTimeToNextPlayAfterFinish();
             long endTime = check ? getTimeStartEnd(dungeon, rules) : getTimeFinishEnd(dungeon, rules); // greater than Systemn current ms
@@ -677,6 +676,14 @@ public class DGamePlayer extends DInstancePlayer {
         return getData().getTimeLastFinished(dungeon.getName()) + rules.getTimeToNextPlayAfterFinish() * 1000 * 60 * 60;
     }
 
+    public long getTimeStartEnd(Game game) {
+        return getData().getTimeLastStarted(game.getDungeon().getName()) + game.getRules().getTimeToNextPlayAfterStart() * 1000 * 60 * 60;
+    }
+
+    public long getTimeFinishEnd(Game game) {
+        return getData().getTimeLastFinished(game.getDungeon().getName()) + game.getRules().getTimeToNextPlayAfterFinish() * 1000 * 60 * 60;
+    }
+
     public boolean checkTimeAfterFinish(Dungeon dungeon, GameRuleProvider rules) {
         return checkTime(rules.getTimeToNextPlayAfterFinish(), getData().getTimeLastFinished(dungeon.getName()));
     }
@@ -706,8 +713,8 @@ public class DGamePlayer extends DInstancePlayer {
         return rules.getTimeToNextLoot() * 60 * 60 * 1000 + getData().getTimeLastLoot(getDGroup().getDungeonName());
     }
 
-    public void ready() {
-        ready(GameTypeDefault.DEFAULT);
+    public boolean ready() {
+        return ready(GameTypeDefault.DEFAULT);
     }
 
     public boolean ready(GameType gameType) {
